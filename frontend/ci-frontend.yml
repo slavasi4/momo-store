@@ -1,0 +1,54 @@
+stages:
+  - build
+  - test
+  - release 
+  - deploy
+  
+include: 
+  - local: 'setup_ssh.yml'
+  - template: Security/SAST.gitlab-ci.yml
+  - project: 'templates/ci'
+    file: 'DockerInDockerTemplate.yml'
+
+  
+build_frontend:
+  stage: build
+  image: docker:20.10.12-dind-rootless
+  script:
+    - cd frontend
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_PIPELINE_ID .
+    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_PIPELINE_ID
+
+sonarqube-frontend:
+  stage: test
+  image: sonarsource/sonar-scanner-cli:latest 
+  script:
+    - cd frontend
+    - >
+      sonar-scanner -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=$SONAR_PROJECT_FRONTEND
+      -Dsonar.projectKey=$SONAR_PROJECT_FRONTEND
+      -Dsonar.sources=.
+      -Dsonar.host.url=$SONAR_URL
+      -Dsonar.login=$SONAR_TOKEN
+
+    
+upload_latest_frontend:
+  stage: release
+  image: docker:20.10.12-dind-rootless
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/frontend:$CI_PIPELINE_ID
+    - docker tag $CI_REGISTRY_IMAGE/frontend:$CI_PIPELINE_ID $CI_REGISTRY_IMAGE/frontend:latest
+    - docker push $CI_REGISTRY_IMAGE/frontend:latest
+
+deploy_frontend:
+  extends: .setup-ssh
+  when: manual
+  script:
+    - ssh ${SSH_USER}@${SSH_HOST} "export "CI_REGISTRY=${CI_REGISTRY}";
+      export "CI_REGISTRY_USER=${CI_REGISTRY_USER}"; 
+      export "CI_REGISTRY_PASSWORD=${CI_REGISTRY_PASSWORD}"; 
+      export "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}"; bash -s" < ./frontend/deploy.sh

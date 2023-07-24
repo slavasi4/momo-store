@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: "latest"
+description: Momo store helm chart
+name: momo-store
+version: CHANGE_ME
+
+dependencies:
+  - name: backend
+    version: 0.0.1
+  - name: frontend
+    version: 0.0.1

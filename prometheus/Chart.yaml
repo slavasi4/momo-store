@@ -1,0 +1,5 @@
+apiVersion: v2
+name: prometheus
+type: application
+version: CHANGE_ME
+appVersion: "v0.0.1"

@@ -1,0 +1,22 @@
+backend:
+  port: 8081
+  image:
+    repository: gitlab.praktikum-services.ru:5050/std-012-019/momo-store/backend
+    tag: latest
+    imagePullPolicy: IfNotPresent
+  replicas: 2
+  revisionHistoryLimit: 15
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 20%
+     
+frontend:
+  port: 80
+  host: "momo-store.dns-cloud.net"
+  configName: nginx-conf
+  replicas: 1
+  revisionHistoryLimit: 15
+  image:
+    repository: gitlab.praktikum-services.ru:5050/std-012-019/momo-store/frontend
+    tag: latest
+    imagePullPolicy: IfNotPresent

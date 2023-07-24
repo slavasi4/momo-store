@@ -1,0 +1,72 @@
+stages:
+  - module-pipelines
+
+frontend:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/frontend/ci-frontend.yml"
+    strategy: depend
+  only:
+    changes: 
+      - frontend/**/*
+
+backend:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/backend/ci-backend.yml"
+    strategy: depend
+  only:
+    changes:  
+      - backend/**/* 
+      
+helm-chart:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/momo-store-chart/ci-helm.yml"
+    strategy: depend
+  only:
+    changes:  
+      - momo-store-chart/**/* 
+      
+grafana:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/grafana/ci-grafana.yml"
+    strategy: depend
+  only:
+    changes:  
+      - grafana/**/* 
+      
+loki:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/loki/ci-loki.yml"
+    strategy: depend
+  only:
+    changes:  
+      - loki/**/* 
+      
+prometheus:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/prometheus/ci-prometheus.yml"
+    strategy: depend
+  only:
+    changes:  
+      - prometheus/**/* 
+      
+promtail:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/promtail/ci-promtail.yml"
+    strategy: depend
+  only:
+    changes:  
+      - promtail/**/* 

@@ -1,0 +1,11 @@
+#cloud-config
+
+users:
+  - name: slavon
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN1en1xV6TAFWRIcfM9J3/ivnXrLN4HBiWrn/+nsdDg7 dexte@DESKTOP-Q1SBEVT
+  - name: ansible
+    shell: /bin/bash
